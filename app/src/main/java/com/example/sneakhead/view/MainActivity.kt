@@ -1,4 +1,4 @@
-package com.example.sneakhead
+package com.example.sneakhead.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
