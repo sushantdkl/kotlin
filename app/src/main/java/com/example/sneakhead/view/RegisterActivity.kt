@@ -60,17 +60,13 @@ fun RegisterBody() {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var selectedCountry by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
     var acceptedTerms by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-    val countries = listOf("USA", "India", "UK", "Germany", "Canada", "Australia", "Japan", "Other")
     val scrollState = rememberScrollState()
 
     val repo = remember { UserRepositoryImplementation() }
@@ -408,17 +404,48 @@ fun RegisterBody() {
             // Kickstart Button
             Button(
                 onClick = {
-                    // Validation - only check required fields
-                    if (firstName.isBlank() || lastName.isBlank() || email.isBlank() ||
-                        password.isBlank() || confirmPassword.isBlank() || gender.isBlank() || !acceptedTerms
-                    ) {
-                        Toast.makeText(context, "Please fill all fields and accept terms", Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-
-                    if (password != confirmPassword) {
-                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
-                        return@Button
+                    // Validation - check required fields with specific error messages
+                    when {
+                        firstName.isBlank() -> {
+                            Toast.makeText(context, "Please enter your first name", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        lastName.isBlank() -> {
+                            Toast.makeText(context, "Please enter your last name", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        email.isBlank() -> {
+                            Toast.makeText(context, "Please enter your email", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                            Toast.makeText(context, "Please enter a valid email address", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        password.isBlank() -> {
+                            Toast.makeText(context, "Please enter a password", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        password.length < 6 -> {
+                            Toast.makeText(context, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        confirmPassword.isBlank() -> {
+                            Toast.makeText(context, "Please confirm your password", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        password != confirmPassword -> {
+                            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        gender.isBlank() -> {
+                            Toast.makeText(context, "Please select your gender", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        !acceptedTerms -> {
+                            Toast.makeText(context, "Please accept the Terms of Service", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
                     }
 
                     userViewModel.register(email, password) { success, message, userID ->
@@ -428,9 +455,7 @@ fun RegisterBody() {
                                 email = email,
                                 firstName = firstName,
                                 lastName = lastName,
-                                gender = gender,
-                                dob = dob,
-                                country = selectedCountry
+                                gender = gender
                             )
                             userViewModel.addUserToDatabase(userID, userModel) { dbSuccess, dbMessage ->
                                 Toast.makeText(context, dbMessage, Toast.LENGTH_LONG).show()
