@@ -43,7 +43,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.request.CachePolicy
 import com.example.sneakhead.model.ProductModel
 import com.example.sneakhead.model.CartItemModel
 import com.example.sneakhead.repository.ProductRepositoryImplementation
@@ -53,7 +52,6 @@ import com.example.sneakhead.viewmodel.CartViewModel
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.res.painterResource
 import com.example.sneakhead.R
-import kotlinx.coroutines.delay
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -207,24 +205,24 @@ fun ProductDashboard() {
         }
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
                 .padding(innerPadding)
         ) {
-            // Search Bar
-            if (showSearchBar) {
+        // Search Bar
+        if (showSearchBar) {
                 item {
-                    SearchBar(
-                        searchQuery = searchQuery,
+            SearchBar(
+                searchQuery = searchQuery,
                         onSearchQueryChange = { searchQuery = it }
                     )
                 }
-            }
-            
-            // Hero Section
+        }
+
+        // Hero Section
             item {
-                HeroSection()
+        HeroSection()
             }
             
             // Trending Section with Categories
@@ -363,16 +361,16 @@ fun ProductDashboard() {
 fun SearchBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = searchQuery,
-        onValueChange = onSearchQueryChange,
+    ) {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = onSearchQueryChange,
         placeholder = { Text("Search products...", color = Color.Gray) },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFFFF6B35),
-            unfocusedBorderColor = Color.Gray,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color(0xFFFF6B35),
+                unfocusedBorderColor = Color.Gray,
             cursorColor = Color(0xFFFF6B35),
-            focusedTextColor = Color.White,
+                focusedTextColor = Color.White,
             unfocusedTextColor = Color.White
         ),
         shape = RoundedCornerShape(12.dp),
@@ -456,7 +454,7 @@ fun CategoryPill(
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) Color(0xFFFF6B35) else Color(0xFF2A2A2A)
         ),
-        shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(20.dp)
     ) {
         Text(
             text = category,
@@ -529,7 +527,7 @@ fun ProductCard(
             
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Product Image with optimized loading
+            // Product Image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -537,15 +535,12 @@ fun ProductCard(
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 if (product.image.isNotEmpty() && product.image != "noimage.png" && product.image.startsWith("http")) {
-                    // Show Cloudinary image with optimized loading
+                    // Show Cloudinary image
                     AsyncImage(
                         model = product.image,
                         contentDescription = "Product Image",
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        // ✅ Fix: Add caching and error handling
-                        error = painterResource(id = R.drawable.noimage),
-                        placeholder = painterResource(id = R.drawable.noimage)
+                        contentScale = ContentScale.Crop
                     )
                 } else {
                     // Show local image or fallback
@@ -559,12 +554,12 @@ fun ProductCard(
             }
             
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Product Details
-            Text(
+                Text(
                 text = product.productName,
-                color = Color.White,
-                fontSize = 14.sp,
+                    color = Color.White,
+                    fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
@@ -572,33 +567,33 @@ fun ProductCard(
             
             Spacer(modifier = Modifier.height(4.dp))
             
-            Text(
+                Text(
                 text = "NRs. ${product.productPrice}",
                 color = Color(0xFFFF6B35),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
             Spacer(modifier = Modifier.height(8.dp))
             
             // Add to Cart Button
             Button(
                 onClick = onAddToCart,
-                modifier = Modifier
+                    modifier = Modifier
                     .fillMaxWidth()
                     .height(32.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Green
                 ),
                 shape = RoundedCornerShape(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
                     contentDescription = "Add to Cart",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
         }
-    }
 }

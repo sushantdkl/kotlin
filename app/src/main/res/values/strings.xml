@@ -9,4 +9,6 @@
     <string name="title_activity_add_product">AddProductActivity</string>
     <string name="title_activity_update_product">UpdateProductActivity</string>
     <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_cart">CartActivity</string>
+    <string name="title_activity_checkout">CheckoutActivity</string>
 </resources>

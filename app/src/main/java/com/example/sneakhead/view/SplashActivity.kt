@@ -49,22 +49,18 @@ fun SplashBody(){
     val context = LocalContext.current
     val activity = context as Activity
 
-    val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
-
-    val localEmail = sharedPreferences.getString("email","").toString()
-
-
-
     LaunchedEffect(Unit) {
         delay(3000)
+        // Move SharedPreferences reading inside LaunchedEffect to avoid blocking UI
+        val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
+        val localEmail = sharedPreferences.getString("email","").toString()
+        
         if (localEmail.isEmpty()) {
-
-
             val intent = Intent(context, LoginActivity::class.java)
             context.startActivity(intent)
             activity.finish()
-        }else{
-            val intent= Intent(context, DashboardActivity::class.java)
+        } else {
+            val intent = Intent(context, DashboardActivity::class.java)
             context.startActivity(intent)
             activity.finish()
         }
@@ -79,8 +75,9 @@ fun SplashBody(){
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Image(
-                painterResource(R.drawable.sneakhead),
-                contentDescription = null
+                painter = painterResource(R.drawable.sneakhead),
+                contentDescription = "SneakHead Logo",
+                modifier = Modifier.padding(16.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
             CircularProgressIndicator()

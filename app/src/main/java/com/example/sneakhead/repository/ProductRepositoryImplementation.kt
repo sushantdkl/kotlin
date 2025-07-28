@@ -46,7 +46,13 @@ class ProductRepositoryImplementation : ProductRepository {
 
                 var imageUrl = response["url"] as String?
 
+                // ✅ Fix: Ensure HTTPS URL and proper formatting
                 imageUrl = imageUrl?.replace("http://", "https://")
+                
+                // ✅ Fix: Add timestamp to prevent caching issues
+                if (imageUrl != null && !imageUrl.contains("?")) {
+                    imageUrl += "?t=${System.currentTimeMillis()}"
+                }
 
                 // ✅ Run UI updates on the Main Thread
                 Handler(Looper.getMainLooper()).post {
@@ -107,49 +113,53 @@ class ProductRepositoryImplementation : ProductRepository {
     }
 
     override fun getAllProducts(callback: (List<ProductModel?>, Boolean, String) -> Unit) {
-        ref.addValueEventListener(object : ValueEventListener {
+        // ✅ Fix: Use single event listener instead of continuous listener to prevent ANR
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                var allProducts = mutableListOf<ProductModel>()
+                val allProducts = mutableListOf<ProductModel>()
                 if (snapshot.exists()) {
                     for (eachData in snapshot.children) {
-                        var products = eachData.getValue(ProductModel::class.java)
+                        val products = eachData.getValue(ProductModel::class.java)
                         if (products != null) {
                             allProducts.add(products)
                         }
                     }
-                    callback(allProducts,true, "fetched")
+                    callback(allProducts, true, "fetched")
+                } else {
+                    callback(emptyList(), true, "no data")
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                callback( emptyList(),false, error.message)
+                callback(emptyList(), false, error.message)
             }
         })
-
     }
 
     override fun getProductById(
         productId: String,
         callback: (ProductModel?, Boolean, String) -> Unit
     ) {
-
-        ref.child(productId).addValueEventListener(object : ValueEventListener {
+        // ✅ Fix: Use single event listener instead of continuous listener
+        ref.child(productId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    var products = snapshot.getValue(ProductModel::class.java)
+                    val products = snapshot.getValue(ProductModel::class.java)
                     if (products != null) {
-                        callback(products,true, "product fetched")
+                        callback(products, true, "product fetched")
+                    } else {
+                        callback(null, false, "product not found")
                     }
+                } else {
+                    callback(null, false, "product not found")
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                callback(null,false, error.message)
+                callback(null, false, error.message)
             }
         })
     }
-
-
 
     override fun updateProduct(
         productId: String,
